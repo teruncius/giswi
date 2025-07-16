@@ -1,11 +1,28 @@
 use std::{collections::HashMap, process::Command};
 use log::*;
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use serde::{Deserialize};
 
 #[derive(Parser)]
+#[derive(Debug)]
+#[command(name = "giswi")]
+#[command(version = "0.1.0")]
+#[command(about = "Switch between multiple git profiles", long_about = None)]
 struct Cli {
-    name: String,
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+#[derive(Debug)]
+enum Commands {
+    /// Switch to a specific git profile
+    To {
+        #[clap(help = "Name of the profile to switch to")]
+        name: String
+    },
+    /// List all available git profiles
+    List { },
 }
 
 #[derive(Deserialize, Debug)]
@@ -16,13 +33,28 @@ struct Config {
     gpgsign: bool,
 }
 
+type ConfigMap = HashMap<String, Config>;
+
 fn main() {
     stderrlog::new().module(module_path!()).init().unwrap();
 
-    let args = Cli::parse();
-    debug!("{}", args.name);
+    let cli = Cli::parse();
+    debug!("{:?}", cli.command);
 
-    let home = std::env::home_dir().unwrap();
+    match &cli.command {
+        Commands::To { name } => {
+            debug!("switching to profile");
+            switch_to_profile(&name);
+        }
+        Commands::List { } => {
+            debug!("list profiles");
+            list_profiles();
+        }
+    }
+}
+
+fn load_config() -> ConfigMap {
+    let home: std::path::PathBuf = std::env::home_dir().unwrap();
     debug!("{:?}", home);
     let path = home.join(".giswi.json");
     debug!("{:?}", path);
@@ -33,7 +65,19 @@ fn main() {
     let config: HashMap<String, Config> = serde_json::from_str(&content).unwrap();
     debug!("{:?}", config);
 
-    let entry = config.get(&args.name).unwrap();
+    return config;
+}
+
+fn list_profiles() {
+    let config = load_config();
+    for name in config.keys() {
+        println!("{}", name);
+    }
+}
+
+fn switch_to_profile(name: &String) {
+    let config = load_config();
+    let entry = config.get(name).unwrap();
     debug!("{:?}", entry);
 
     let mut command = Command::new("git");
