@@ -5,7 +5,7 @@ use serde::{Deserialize};
 
 #[derive(Parser)]
 #[derive(Debug)]
-#[command(name = "giswi")]
+#[command(name = "gis")]
 #[command(version = "0.1.0")]
 #[command(about = "Switch between multiple git profiles", long_about = None)]
 struct Cli {
@@ -56,7 +56,7 @@ fn main() {
 fn load_config() -> ConfigMap {
     let home: std::path::PathBuf = std::env::home_dir().unwrap();
     debug!("{:?}", home);
-    let path = home.join(".giswi.json");
+    let path = home.join(".gis.json");
     debug!("{:?}", path);
 
     let content = std::fs::read_to_string(path).unwrap();

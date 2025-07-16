@@ -5,4 +5,4 @@ build:
     cargo build -r
 
 install:
-    cp ./target/release/giswi /usr/local/bin/
+    sudo cp ./target/release/gis /usr/local/bin/

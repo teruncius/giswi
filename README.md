@@ -1,4 +1,4 @@
-# giswi
+# gis
 
 ## Run
 
@@ -15,12 +15,12 @@ cargo build -r
 ## Install
 
 ```sh
-sudo cp ./target/release/giswi /usr/local/bin/
+sudo cp ./target/release/gis /usr/local/bin/
 ```
 
 ## Config
 
-Create a `.giswi.json` file in your home directory.
+Create a `.gis.json` file in your home directory.
 
 ```json
 {
